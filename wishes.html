@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Let's Celebrate!</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+        font-family: "Comic Sans MS", cursive, sans-serif;
+      }
+
+      h1 {
+        text-align: center;
+        color: #fff;
+        margin: 50px 20px 20px;
+        font-size: 2.5rem;
+        text-shadow: 2px 2px #ff7e5f;
+      }
+
+      .btn-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin: 30px 10px;
+      }
+
+      button {
+        padding: 12px 25px;
+        font-size: 1.5rem;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: transform 0.2s, background-color 0.3s;
+        width: 140px;
+      }
+
+      #popper {
+        background-color: #ff4d6d;
+        color: white;
+      }
+
+      #popper:hover {
+        transform: scale(1.05);
+        background-color: #e33c5e;
+      }
+
+      #backBtn {
+        background-color: #4d79ff;
+        color: white;
+      }
+
+      #backBtn:hover {
+        transform: scale(1.05);
+        background-color: #345fd1;
+      }
+
+      .balloon {
+        position: absolute;
+        animation: float 10s linear infinite;
+        z-index: 2;
+        pointer-events: none;
+        width: 60px;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(100vh);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-120vh);
+          opacity: 0;
+        }
+      }
+
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 9999;
+      }
+
+      @media (min-width: 768px) {
+        h1 {
+          font-size: 3rem;
+        }
+
+        button {
+          font-size: 1.2rem;
+          width: auto;
+        }
+
+        .balloon {
+          width: 100px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🎉 Let the Celebration Begin! 🎉</h1>
+
+    <div class="btn-container">
+      <button id="popper">🎊 Pop the Party!</button>
+      <button id="backBtn">🔙 Go Back</button>
+    </div>
+
+    <canvas id="confetti"></canvas>
+
+    <script>
+      // 🎈 Balloon generator
+      const balloonImages = [
+        "images/balloon1.png",
+        "images/balloon2.png",
+        "images/balloon3.png",
+      ];
+
+      function createBalloon() {
+        const balloon = document.createElement("img");
+        balloon.src =
+          balloonImages[Math.floor(Math.random() * balloonImages.length)];
+        balloon.classList.add("balloon");
+        balloon.style.left = Math.random() * 100 + "vw";
+        balloon.style.animationDuration = 5 + Math.random() * 5 + "s";
+        document.body.appendChild(balloon);
+
+        setTimeout(() => balloon.remove(), 10000);
+      }
+
+      setInterval(createBalloon, 300);
+
+      // 🎊 Confetti
+      const canvas = document.getElementById("confetti");
+      const ctx = canvas.getContext("2d");
+      let confetti = [];
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
+      function createConfettiPiece() {
+        return {
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          size: Math.random() * 8 + 4,
+          color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+          speedY: Math.random() * 3 + 2,
+          tilt: Math.random() * 10 - 5,
+        };
+      }
+
+      function drawConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confetti.forEach((c) => {
+          ctx.fillStyle = c.color;
+          ctx.beginPath();
+          ctx.ellipse(c.x, c.y, c.size, c.size / 2, c.tilt, 0, 2 * Math.PI);
+          ctx.fill();
+          c.y += c.speedY;
+          c.x += Math.sin(c.tilt);
+        });
+
+        requestAnimationFrame(drawConfetti);
+      }
+
+      function popConfetti() {
+        for (let i = 0; i < 150; i++) {
+          confetti.push(createConfettiPiece());
+        }
+
+        setTimeout(() => {
+          confetti = [];
+        }, 4000);
+      }
+
+      document.getElementById("popper").addEventListener("click", () => {
+        popConfetti();
+      });
+
+      document.getElementById("backBtn").addEventListener("click", () => {
+        window.history.back();
+      });
+
+      drawConfetti();
+    </script>
+  </body>
+</html>
